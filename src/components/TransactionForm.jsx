@@ -1,27 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
-export default function TransactionForm({ onAdd }) {
+export default function TransactionForm({ accounts = [], onAdd }) {
   const [date, setDate] = useState('');
-  const [debitAccount, setDebitAccount] = useState('');
-  const [creditAccount, setCreditAccount] = useState('');
+  const [debitId, setDebitId] = useState('');
+  const [creditId, setCreditId] = useState('');
   const [amount, setAmount] = useState('');
   const [memo, setMemo] = useState('');
   const [loading, setLoading] = useState(false);
 
+    // 科目一覧をSupabaseから取得
+    useEffect(() => {
+      const fetchAccounts = async () => {
+        const { data, error } = await supabase
+          .from('accounts')
+          .select('*')
+          .order('category', { ascending: true });
+
+        if (error) {
+          console.error('科目の取得に失敗しました:', error);
+        } else {
+          setAccounts(data);
+        }
+      };
+
+      fetchAccounts();
+    }, []);
+
+  // 収支データをSupabaseに登録
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     const newTransaction = {
       date,
-      debit: debitAccount,
-      credit: creditAccount,
+      debit_id: debitId,
+      credit_id: creditId,
       amount: Number(amount),
       memo,
     };
 
-    // Supabaseに登録
     const { data, error } = await supabase.from('transactions').insert([newTransaction]).select();
 
     if (error) {
@@ -33,14 +51,22 @@ export default function TransactionForm({ onAdd }) {
 
       // 入力フォームをクリア
       setDate('');
-      setDebitAccount('');
-      setCreditAccount('');
+      setDebitId('');
+      setCreditId('');
       setAmount('');
       setMemo('');
     }
 
     setLoading(false);
   };
+
+  // カテゴリごとにグループ化
+  const groupedAccounts = accounts.reduce((acc, account) => {
+    if (!acc[account.classification]) acc[account.classification] = [];
+    acc[account.classification].push(account);
+    return acc;
+  }, {});
+
 
   return (
     <form onSubmit={handleSubmit} className="p-4 shadow rounded space-y-3">
@@ -56,23 +82,43 @@ export default function TransactionForm({ onAdd }) {
       </div>
       <div>
         <label className="block font-medium">借方科目</label>
-        <input
-          type="text"
-          value={debitAccount}
-          onChange={(e) => setDebitAccount(e.target.value)}
+        <select
+          value={debitId}
+          onChange={(e) => setDebitId(e.target.value)}
           required
           className="border p-2 rounded w-full"
-        />
+        >
+          <option value="">選択してください</option>
+          {Object.entries(groupedAccounts).map(([category, items]) => (
+            <optgroup key={category} label={category}>
+              {items.map((account) => (
+                <option key={account.id} value={account.id}>
+                  {account.name}
+                </option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
       </div>
       <div>
         <label className="block font-medium">貸方科目</label>
-        <input
-          type="text"
-          value={creditAccount}
-          onChange={(e) => setCreditAccount(e.target.value)}
+        <select
+          value={creditId}
+          onChange={(e) => setCreditId(e.target.value)}
           required
           className="border p-2 rounded w-full"
-        />
+        >
+          <option value="">選択してください</option>
+          {Object.entries(groupedAccounts).map(([category, items]) => (
+            <optgroup key={category} label={category}>
+              {items.map((account) => (
+                <option key={account.id} value={account.id}>
+                  {account.name}
+                </option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
       </div>
       <div>
         <label className="block font-medium">金額</label>
