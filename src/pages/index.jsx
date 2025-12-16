@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import TransactionForm from '../components/TransactionForm';
 import TransactionTable from '../components/TransactionTable';
+import SideMenu from "../components/SideMenu";
 
 export default function Home() {
   const [accounts, setAccounts] = useState([]);
@@ -55,10 +56,15 @@ export default function Home() {
   };
 
   return (
+ <>
+    <SideMenu />
+    
     <div className="max-w-3xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">複式簿記 家計簿</h1>
       <TransactionForm accounts={accounts} onAdd={handleAdd} />
       <TransactionTable transactions={transactions} />
     </div>
+
+ </>
   );
 }

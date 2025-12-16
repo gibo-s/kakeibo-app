@@ -5,6 +5,7 @@ import dayjs from "dayjs";
 import { supabase } from "../lib/supabaseClient";
 import BudgetForm from "../components/BudgetForm";
 import BudgetTable from "../components/BudgetTable";
+import SideMenu from "../components/SideMenu";
 
 export default function BudgetPage() {
   const [month, setMonth] = useState(dayjs().format("YYYY-MM"));
@@ -123,7 +124,9 @@ export default function BudgetPage() {
   };
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">      
+    <div className="p-6 max-w-3xl mx-auto">
+      <SideMenu />
+      
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">予算管理</h1>
         <div>

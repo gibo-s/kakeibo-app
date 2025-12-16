@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import BalanceSheetTable from "@/components/BalanceSheetTable";
 import dayjs from "dayjs";
+import SideMenu from "../components/SideMenu";
 
 export default function BalanceSheetPage() {
   const [balances, setBalances] = useState([]);
@@ -71,6 +72,8 @@ export default function BalanceSheetPage() {
 
   return (
     <div className="max-w-3xl mx-auto p-6">
+      <SideMenu />
+      
       <h1 className="text-xl font-bold mb-4">貸借対照表</h1>
 
       <div className="mb-4">

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import AccountForm from "../components/AccountForm";
 import AccountTable from "../components/AccountTable";
+import SideMenu from "../components/SideMenu";
 
 export default function AccountsPage() {
   const [accounts, setAccounts] = useState([]);
@@ -77,6 +78,8 @@ export default function AccountsPage() {
 
   return (
     <div className="max-w-3xl mx-auto p-6">
+      <SideMenu />
+      
       <h1 className="text-2xl font-bold mb-4">科目管理</h1>
 
       <p className="mb-4 text-sm text-gray-600">
